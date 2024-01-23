@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3  # 获取源码的 checkout命令
+      - uses: actions/checkout@v3  # 获取源码的 checkout 命令
 
       - name: Install Hugo
         run: |
@@ -23,11 +23,13 @@ jobs:
           git clone https://${{secrets.TOKEN}}@github.com/wushengyouya/hugo-code.git
           mkdir -p hugo-code/content/post
           shopt -s extglob
-          cp -r !(hugo-code) hugo-code/content/post         
+          cp -r !(hugo-code) hugo-code/content/post
 
       - name: Generate Site
         run: |
           cd hugo-code 
+          # 初始化子模块
+          git submodule update --init --recursive
           hugo -D          
 
       - name: Publish
@@ -41,4 +43,4 @@ jobs:
           git add .
           git commit -m "Update Site at $(date "+%Y%m%d-%H%M%S")"
           git remote add origin https://${{secrets.TOKEN}}@github.com/wushengyouya/wushengyouya.github.io.git
-          git push --force -u origin main          
+          git push --force -u origin main
