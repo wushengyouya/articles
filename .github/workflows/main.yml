@@ -30,6 +30,7 @@ jobs:
           cd hugo-code 
           # 初始化子模块
           git submodule update --init --recursive
+          git submodule update --recursive --remote
           hugo -D          
 
       - name: Publish
