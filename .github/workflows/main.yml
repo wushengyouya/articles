@@ -7,27 +7,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3  # 获取源码的 checkout命令
+      - uses: actions/checkout@v2
 
       - name: Install Hugo
         run: |
-          sudo apt update -y
-          # wget https://github.com/gohugoio/hugo/releases/download/v0.121.2/hugo_0.121.2_linux-amd64.deb
-          wget https://github.com/gohugoio/hugo/releases/download/v0.121.2/hugo_extended_0.121.2_linux-amd64.deb
-          # sudo dpkg -i hugo_0.121.2_linux-amd64.deb
-          sudo dpkg -i hugo_extended_0.121.2_linux-amd64.deb          
+          Invoke-WebRequest -Uri https://github.com/gohugoio/hugo/releases/download/v0.121.2/hugo_extended_0.121.2_Windows-64bit.zip -OutFile hugo.zip
+          Expand-Archive -Path hugo.zip -DestinationPath C:\hugo
+          [System.Environment]::SetEnvironmentVariable("PATH", "$env:PATH;C:\hugo", [System.EnvironmentVariableTarget]::Machine)
 
       - name: Preprocess Articles
         run: |
           git clone https://${{secrets.TOKEN}}@github.com/wushengyouya/hugo-code.git
-          # for i in *.md; do file_basename=$(basename "$i" .md); file_date=$(date -d @$(git log --follow --format=%at --date default "$i" | tail -1) --rfc-3339=seconds | sed 's/ /T/'); metadata="---\ntitle: $file_basename\ndate: $file_date\n---"; firstline=$(head -n 1 "$i"); if [[ $firstline != -* ]]; then sed -i "1 i $metadata" "$i"; fi; done
-          mkdir -p hugo-code/content/post
-          ls
-          shopt -s extglob
-          cp -r !(hugo-code) hugo-code/content/post         
+          New-Item -ItemType Directory -Path hugo-code\content\post
+          Get-ChildItem -Directory | Where-Object { $_.Name -ne "hugo-code" } | Copy-Item -Destination hugo-code\content\post -Recurse
 
       - name: Generate Site
         run: |
@@ -36,13 +31,13 @@ jobs:
 
       - name: Publish
         run: |
-          cd hugo-code/public
+          cd hugo-code\public
           git config --global user.email "1009889421@qq.com"
           git config --global user.name "wushengyouya"
           git config --global init.defaultBranch main
           git init
           git branch -M main
           git add .
-          git commit -m "Update Site at $(date "+%Y%m%d-%H%M%S")"
+          git commit -m "Update Site at $(Get-Date -Format 'yyyyMMdd-HHmmss')"
           git remote add origin https://${{secrets.TOKEN}}@github.com/wushengyouya/wushengyouya.github.io.git
-          git push --force -u origin main          
+          git push --force -u origin main
