@@ -25,7 +25,8 @@ jobs:
           git clone https://${{secrets.TOKEN}}@github.com/wushengyouya/hugo-code.git
           # for i in *.md; do file_basename=$(basename "$i" .md); file_date=$(date -d @$(git log --follow --format=%at --date default "$i" | tail -1) --rfc-3339=seconds | sed 's/ /T/'); metadata="---\ntitle: $file_basename\ndate: $file_date\n---"; firstline=$(head -n 1 "$i"); if [[ $firstline != -* ]]; then sed -i "1 i $metadata" "$i"; fi; done
           mkdir -p hugo-code/content/post
-          cp -r * hugo-code/content/post         
+          shopt -s extglob
+          cp -r !(hugo-code) hugo-code/content/post         
 
       - name: Generate Site
         run: |
