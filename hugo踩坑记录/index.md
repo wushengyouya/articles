@@ -1,3 +1,16 @@
++++
+author = "屑莹"
+title = "hugo 踩坑记录"
+date = 2024-01-24T03:16:00+08:00
+description = ""
+categories = [
+    "编程",
+]
+tags = [
+    "hugo",
+]
+image = "20230116234811.png"
++++
 # githun action 
 - Hugo 编译后生成的是xml问题一般是主题没加载上
 - 主题如果采用submoudle 模式，在action配置文件需要加入加载主题子模块的代码
