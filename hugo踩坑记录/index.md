@@ -22,6 +22,13 @@ image = "image.png"
     git submodule update --recursive --remote
 ```
 
+# submodule
+如果推送了submodule子模块,主仓库需要执行下面的代码从远程同步一下
+```shell
+    git submodule update --recursive --remote # 同步子模块
+```
+
+
 # Hugo编译后css文件加载不出,hugo server显示正常
 [Hugo编译后与hugo server显示不一致](https://www.coder.work/article/7617383)
 [stackoverflow](https://stackoverflow.com/questions/62114592/hugo-not-generating-the-same-styling-as-in-development-mode)
