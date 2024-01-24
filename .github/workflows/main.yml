@@ -33,6 +33,9 @@ jobs:
           # 初始化子模块
           git submodule update --init --recursive
           git submodule update --recursive --remote
+          cd themes/hugo-theme-stack/
+          git checkout main
+          cd ../..
           hugo -D          
 
       - name: Publish
