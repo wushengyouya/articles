@@ -1,6 +1,6 @@
 ---
 author: 屑莹
-title: 我的图片展示相册，欢迎大家来观看
+title: 我的图片展示相册欢迎大家来观看
 date: 2024-01-25
 description: 
 image: image-2.png
