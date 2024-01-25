@@ -16,4 +16,4 @@ lang: cn
 dir:
 ---
 # 测试cdn 
-![[20230123124122.png]]![[Pasted image 20240125012432.png]]
+![Alt text](20230123124122-1.png)
