@@ -23,9 +23,10 @@ image = "image.png"
 ```
 
 # submodule
-如果推送了submodule子模块,主仓库需要执行下面的代码从远程同步一下
+如果推送了submodule子模块,主仓库需要执行下面的代码从远程同步一下，主仓库同步子模块的仓库后，子模块分支会指向空，需要手动切换回main分支
 ```shell
-    git submodule update --recursive --remote # 同步子模块
+    git submodule update #更新本地
+    git submodule update --recursive --remote # 从远程同步子模块
 ```
 
 
