@@ -1,22 +1,18 @@
 {
   "main": {
-    "id": "58c0f7cc05ae2117",
+    "id": "dc33932d8999da03",
     "type": "split",
     "children": [
       {
-        "id": "ecbc099af4de7151",
+        "id": "8fcb31bb8256c41b",
         "type": "tabs",
         "children": [
           {
-            "id": "937db5ea76e37a7b",
+            "id": "111278f1a61ce0dd",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "凡人修仙传/index.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -25,15 +21,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "f41b7e22ae55f49b",
+    "id": "ec8026809462e125",
     "type": "split",
     "children": [
       {
-        "id": "43767245740d9d8b",
+        "id": "cee74b84264e2992",
         "type": "tabs",
         "children": [
           {
-            "id": "e86fd978a71ef530",
+            "id": "0fd3aed6d0af6bab",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -43,7 +39,7 @@
             }
           },
           {
-            "id": "18cf40d3aac651ff",
+            "id": "adb2ce3273c9fb35",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -58,7 +54,7 @@
             }
           },
           {
-            "id": "445c0bbdcb132a3b",
+            "id": "27e9ca3c6bc7bf8a",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -72,20 +68,19 @@
     "width": 300
   },
   "right": {
-    "id": "316351cd323f5789",
+    "id": "1d2d5f3c8ac804d5",
     "type": "split",
     "children": [
       {
-        "id": "7e2a6c57e78d5fbc",
+        "id": "1a1597e63ae8d610",
         "type": "tabs",
         "children": [
           {
-            "id": "55a9d9ae0e8a3e30",
+            "id": "7e54c88d0f61f8db",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "凡人修仙传/index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,19 +92,18 @@
             }
           },
           {
-            "id": "b576bbbf48df3418",
+            "id": "0d2b303622143e86",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "凡人修仙传/index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "380a4b51f98f7dbd",
+            "id": "8a49fca7a0e68a4e",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -120,13 +114,11 @@
             }
           },
           {
-            "id": "cc2752259d591113",
+            "id": "70a48a8e19bfa9cd",
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "凡人修仙传/index.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -143,18 +135,22 @@
       "canvas:新建白板": false,
       "daily-notes:打开/创建今天的日记": false,
       "templates:插入模板": false,
-      "command-palette:打开命令面板": false,
-      "obsidian-excalidraw-plugin:新建绘图文件": false
+      "command-palette:打开命令面板": false
     }
   },
-  "active": "937db5ea76e37a7b",
+  "active": "0fd3aed6d0af6bab",
   "lastOpenFiles": [
-    "未命名.canvas",
+    "凡人修仙传/Pasted image 20240127134659-1.png",
+    "凡人修仙传/Pasted image 20240127134909-1.png",
+    "Pasted image 20240127134659-1.png",
+    "Pasted image 20240127134909-1.png",
+    "index.md",
+    "Templates/hugo模版.md",
     "凡人修仙传/index.md",
     "凡人修仙传/Pasted image 20240127134909.png",
     "凡人修仙传/Pasted image 20240127134659.png",
-    "Templates/hugo模版.md",
-    "未命名.md",
+    "Pasted image 20240127141612.png",
+    "Pasted image 20240127141554.png",
     "凡人修仙传"
   ]
 }
