@@ -12,7 +12,7 @@ tags = [
 image = "image.png"
 +++
 
-# githun action 
+## githun action 
 - Hugo 编译后生成的是xml问题一般是主题没加载上
 - 主题如果采用submoudle 模式，在action配置文件需要加入加载主题子模块的代码
 ```shell
@@ -22,7 +22,7 @@ image = "image.png"
     git submodule update --recursive --remote
 ```
 
-# submodule
+## submodule
 如果推送了submodule子模块,主仓库需要执行下面的代码从远程同步一下，主仓库同步子模块的仓库后，子模块分支会指向空，需要手动切换回main分支
 ```shell
     git submodule update #更新本地
@@ -30,11 +30,11 @@ image = "image.png"
 ```
 
 
-# Hugo编译后css文件加载不出,hugo server显示正常
+## Hugo编译后css文件加载不出,hugo server显示正常
 [Hugo编译后与hugo server显示不一致](https://www.coder.work/article/7617383)
 [stackoverflow](https://stackoverflow.com/questions/62114592/hugo-not-generating-the-same-styling-as-in-development-mode)
 
-# windows换行问题
+## windows换行问题
 ![Alt text](image.png)
 
 - test

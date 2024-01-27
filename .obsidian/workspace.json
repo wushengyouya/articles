@@ -11,8 +11,12 @@
             "id": "111278f1a61ce0dd",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "hugo踩坑记录/index.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -81,6 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "hugo踩坑记录/index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "hugo踩坑记录/index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +124,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "hugo踩坑记录/index.md"
+              }
             }
           }
         ]
@@ -138,15 +146,19 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "0fd3aed6d0af6bab",
+  "active": "111278f1a61ce0dd",
   "lastOpenFiles": [
+    "hugo踩坑记录/1.md",
+    "docker学习/index.md",
+    "docker学习/image-11.png",
+    "测试图片/index.md",
+    "凡人修仙传/index.md",
     "凡人修仙传/Pasted image 20240127134659-1.png",
     "凡人修仙传/Pasted image 20240127134909-1.png",
     "Pasted image 20240127134659-1.png",
     "Pasted image 20240127134909-1.png",
     "index.md",
     "Templates/hugo模版.md",
-    "凡人修仙传/index.md",
     "凡人修仙传/Pasted image 20240127134909.png",
     "凡人修仙传/Pasted image 20240127134659.png",
     "Pasted image 20240127141612.png",
