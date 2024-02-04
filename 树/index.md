@@ -14,12 +14,13 @@ tags:
 ## 树的遍历
 ## 前缀树Trie
 ![Alt text](image.png) ![Alt text](image-1.png)
+
 前缀树trie又称为字典树或者单词查找树，是一种广泛应用于文本查找，路由查找的存储数据结构。
 
 trie是一个多叉树结构，树中的每个节点存储一个字符，它与普通树状数据结构最大的差异是，存储数据的key不存放在单个节点中，
 而是从根节点root出发一直到目标节点target node 之间的沿途路径组成。这样的构造方式最大的好处是，拥有前缀相同的字符串可以复用
 公共的父节点，直到在首次出现不同字符的位置才出现分叉，形成多叉树结构。
-[leetcode习题](https://link.zhihu.com/?target=https%3A//leetcode.cn/problems/implement-trie-prefix-tree/submissions/ "练习题")
+[leetcode习题](https://leetcode.cn/problems/implement-trie-prefix-tree/submissions/ "练习题")
 
 初始化节点
 ```go

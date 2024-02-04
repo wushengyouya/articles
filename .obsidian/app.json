@@ -1,1 +1,8 @@
-{}
+{
+  "livePreview": false,
+  "vimMode": false,
+  "autoConvertHtml": true,
+  "useMarkdownLinks": true,
+  "attachmentFolderPath": "./",
+  "promptDelete": false
+}
