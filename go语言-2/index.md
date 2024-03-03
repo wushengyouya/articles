@@ -3,7 +3,7 @@ author: 吴生有崖
 title: go语言-2
 date: 2024-02-25
 description: 
-image: image.png
+image: image.jpg
 categories:
   - 编程
 tags:
