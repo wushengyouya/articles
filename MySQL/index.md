@@ -3,7 +3,7 @@ author: 吴生有崖
 title: mysql
 date: 2024-03-02
 description: 
-image: image.png
+image: image.jpg
 categories:
   - 编程
 tags:
