@@ -1,9 +1,9 @@
 ---
 author: 吴生有涯
 title: GMP原理
-date: 2024-2-4
+date: 2023-2-4
 description: 
-image: image.jpg
+image: image-1.png
 categories:
   - 编程
 tags:

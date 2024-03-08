@@ -1,7 +1,7 @@
 +++
 author = "屑莹"
 title = "hugo踩坑记录"
-date = 2024-01-24T03:27:52+08:00
+date = 2023-01-24T03:27:52+08:00
 description = ""
 categories = [
     "编程",

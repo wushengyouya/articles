@@ -1,7 +1,7 @@
 ---
 author: 吴生有崖
 title: redis基础
-date: 2024-02-17
+date: 2023-02-17
 description: 
 image: image.png
 categories:

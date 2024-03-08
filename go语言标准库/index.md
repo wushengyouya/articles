@@ -1,7 +1,7 @@
 ---
 author: 吴生有崖
 title: go语言标准库
-date: 2024-02-25
+date: 2023-02-25
 description: 
 image: image.jpg
 categories:
@@ -275,3 +275,98 @@ var data string = "你好"
 //泛型结构体
 stu := &Student[*string]{name: "张三", data: &data}
 ```
+
+## rpc
+像调用本地函数一样，调用远程函数。
+### 服务端
+1. 注册rpc服务对象,给对象绑定方法（1.定义类 2.绑定类方法）
+```go
+rpc.RegisterName("服务名",回调对象)
+```
+2. 创建监听器
+```go
+listener,err:=net.Listen()
+```
+3. 建立连接
+```go
+conn,err:=listener.Accpet()
+```
+4. 将连接绑定rpc服务
+```go
+rpc.ServeConn(conn)
+```
+### 客户端
+1. 用rpc连接服务器
+```go
+conn,err:=rpc.Dial()
+```
+2. 调用远程函数
+```go
+conn.Call("服务名.方法名",传入参数，传出参数)
+```
+### rpc相关函数
+1. 注册服务
+```go
+func RegisterName(name string, rcvr interface{}) error
+	参1：服务名。字符串类型
+	参2：对应rpc对象。该对象绑定方法要满足如下条件：
+		1）方法必须是导出的。 ----指包外可见。首字母大写
+		2）方法必须有两个参数，都是导出类型、内奸类型
+		3）方法第二个参数必须是“指针”（传出参数）
+		4）方法只有一个error接口接口类型的返回值
+	举例：
+	type World struct{
+	}
+	func (w *World)HelloWorld(name string,resp *string)error{
+	}
+	注册服务:
+	rpc.RegisterName("服务名",new(World))
+```
+2. 绑定服务
+```go
+func ServeConn(conn io.ReadWriteCloser)
+	-- conn: 成功就建立好连接的socket
+rpc.ServeConn(conn)
+```
+3. 调用远程函数
+```go
+func (client *Client) Call(serviceMethod string, args interface{}, reply interface{}) error
+	serviceMethod:"服务名.方法名"
+	args:传入参数。方法需要的数据
+	reply:传出参数。定义var变量,&变量名  完成传参
+```
+### protobuf
+1. message成员编号，可以不从1开始但是哦不能重复，编号不能使用19000-19999
+2. 可以使用message嵌套
+3. 定义数组、切片使用repeated关键字
+4. 可以使用枚举，编号必须从0开始
+5. 可以使用联合体。oneof关键字，成员编号不能重复。
+```go
+//定义包名
+package pb;
+//定义枚举类型
+enum Week{
+	Monday=0;//枚举值必须从 0 开始
+	Turesday=1;
+}
+//定义消息体
+message Student{
+	int32 age=1;//可以不从 1 开始，但不能重复
+	string name=2;
+    People p=3;//消息体可以进行组合
+	repeated int32 score=4;//定义数组类型
+	
+	//枚举
+	Week w=5;
+	//联合体
+	oneof data{
+		string teacher=6;
+		string class=7;
+	}
+}
+//消息体可以进行嵌套
+message People{
+	int32 weight=1;
+}
+```
+
