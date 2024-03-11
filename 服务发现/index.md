@@ -9,19 +9,20 @@ categories:
 tags:
   - 服务发现
 ---
-## 概览图
-![alt text](image.png)
-## 常用命令
-```bash
-consul agent --dev # 开启开发者模式
-```
-## 服务端consul
+
+## consul
 Consul是一个服务网格解决方案，提供了一个功能齐全的控制平面，具有服务发现、配置和分段功能。这些功能中的每一项都可以根据需要单独使用，也可以一起使用来构建一个完整的服务网格。
 - 服务发现
 - 健康检查
 - KV存储
 - 安全服务通信
 - 多数据中心
+
+### 常用命令
+```bash
+consul agent --dev # 开启开发者模式
+```
+### 服务端consul
 
 引入consul包
 ```go
