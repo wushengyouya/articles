@@ -3,7 +3,6 @@ author: 吴生有涯
 title: npm版本bug
 date: 2024-06-19
 description: 
-image: image-1.png
 categories:
   - 编程
 tags:
