@@ -1,7 +1,7 @@
 ---
 author: 吴生有涯
 title: Foundry
-date: 2023-06-20
+date: 2024-06-20
 description: 
 image: image-1.png
 categories:
@@ -130,7 +130,8 @@ forge verify-contract \
     <the_contract_address> \
 	    src/MyToken.sol:MyToken 
 ```
-2. 脚本验证
+
+#### 脚本部署合约
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.25;
@@ -150,8 +151,13 @@ contract MyTokenScript is Script {
     }
 }
 ```
-这个部署脚本本身就是一个智能合约。脚本是通过调用名为`run`的函数来执行的
+```bash
+forge script script/MyTokenScript.s.sol:MyTokenScript --broadcast --rpc-url <RPC_URL> --private-key <YOUR_PRIVATE_KEY>
+```
+- `vm.startBroadcast()`: 标记从这一点开始的所有交易都应该被广播。这意味着在`vm.startBroadcast()`和`vm.stopBroadcast()`之间的所有操作都会被记录并准备广播。
+- `--broadcst`: 广播交易，执行实际部署操作广播到区块链网络。不加则只是模拟部署过程。
 
+这个部署脚本本身就是一个智能合约。脚本是通过调用名为`run`的函数来执行的
 ## Cast
 cast是foundry用于执行以太坊RPC调用的命令行工具。
 ```bash
@@ -539,4 +545,10 @@ anvil --fork-url <YOUR_ENDPOINT_URL> --form-block-number 1900000
 ```
 - `--fork-url` 标签用于从远端获取区块链状态
 - `--fork-block-number` 用于从特定区块号开始分叉区块链状态
+
+## 常见错误
+1. OutOfFunds：在区块链和智能合约的上下文中，"OutOfFunds"（资金不足）是一个常见的错误或异常情况
+2. PrecompileOOG：指在执行预编译合约（Precompiled Contracts）时遇到的"Out of Gas"（OOG）错误，交易提供的Gas不足以覆盖执行所需的全部Gas时
+- transfer 转账有gas限制,而使用call方法没有
+3. division or modulo by zero：如果你尝试进行除法或取模运算，并且除数为0，那么会触发一个运行时错误，导致交易被回滚
 
