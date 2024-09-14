@@ -228,6 +228,20 @@ cast etherscan-source <contract-address>
 # 案例
 cast etherscan-source 0xf404916d6A17ca37584a9f673a40c1F839825fC9
 ```
+### 获取链上Storage槽的private状态变量
+```bash
+cast storage 0x5FbDB2315678afecb367f032d93F642f64180aa3 1 --rpc-url http://localhost:8545
+```
+### 将bytes32转为string
+```bash
+cast parse-bytes32-string 0x6d696b617361000000000000000000000000000000000000000000000000000c
+```
+### 获取合约所有storage变量
+```bash
+forge inspect <contract_name> <option>
+forge inspect PasswordStore storage
+```
+
 
 ## Anvil
 Anvil是Foundry套件的一部分，专为提供一个便于本地测试和开发的以太坊节点而设计。Anvil与Forge、Cast、Chisel一起为智能合约开发者提供了一个完整的工具集，以支持从开发到测试的整个生命周期。
