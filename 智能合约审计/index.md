@@ -1,6 +1,6 @@
 ---
 author: 吴生有涯
-title: Foundry
+title: 智能合约审计
 date: 2024-09-12
 description: 
 image: 
@@ -12,12 +12,15 @@ tags:
 ---
 
 # 智能合约审计
-## 有状态模糊测试
+- Foundry Fuzzing = Stateless fuzzing
+
+- Foundry Invariant = Stateful fuzzing
+## 有状态模糊测试(Foundry Invariant)
 - 在多次测试运行之间保持合同状态
 - 允许在一系列操作中测试复杂场景
 - 适用于检查跨多个操作应该始终保持不变的属性
 - 需要更多的设置，但可以发现更深层次的问题
-## 无状态模糊测试
+## 无状态模糊测试(Foundry fuzzing)
 - 每次测试运行都会创建一个新的合约实例
 - 不保留任何状态
 - 适用于单独测试各个函数

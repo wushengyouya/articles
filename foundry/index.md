@@ -41,6 +41,30 @@ forge --version
 ```
 > Windows一般采用git bash内执行安装,因为目前Foundryup不支持Powershell
 
+## 私钥的存储方式
+1. 测试阶段可以使用键值对`$PRIVATE_KEY`存放在`.env`文件中,并保证`.env`文件包含在`.gitignore`中
+2. 涉及到真实货币时可以采用`--interactive` 方式或者使用 [keystore file protected by a password](https://github.com/Cyfrin/foundry-full-course-f23?tab=readme-ov-file#can-you-encrypt-a-private-key---a-keystore-in-foundry-yet)
+3. 使用 [thirdweb](https://thirdweb.com/)部署
+```bash
+forge script --help
+# 指定一个加密文件存储路径，该文件由密码加密，这样私钥不会明文显示
+forge script --keystore <PATH>
+
+# 使用私钥导入钱包
+cast wallet import <NAME> --interactive
+cast wallet list
+forge script script/DeploySimpleStorage.s.sol:DeploySimpleStorage --rpc-url 127.0.0.1:8545 --account defaultkey --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast -vvvv
+```
+
+## EVM和zksync交易类型
+以太坊虚拟机（EVM）和ZKsync生态系统支持多种交易类型，以适应各种以太坊改提案(EIP)。最初，以太坊只有一种交易类型(`0x0`)，
+但随着生态系统演变，通过各种EIP引入了多种类型。
+- Legacy `0x0`：evm最初的交易类型
+- EIP-2930 `0x1`：
+- EIP-1559 `0x2`：当前EVM的默认类型。在以太坊伦敦升级中引入，EIP-1559：ETH 1.0 链费用市场变更，修改了交易费用的处理方式，用基础费用替换了 gasPrice ，并允许用户设置 maxPriorityFeePerGas 和 maxFeePerGas 。
+- EIP-712 `0x71`：类型化结构化数据哈希和签名，允许在交易中实现结构化数据的哈希和签名。ZKsync Era 使用这项技术来实现账户抽象和代付主等功能。
+
+
 ## Forge
 ### forge init初始化项目 
 ```bash
