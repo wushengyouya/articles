@@ -56,7 +56,13 @@ cast wallet list
 forge script script/DeploySimpleStorage.s.sol:DeploySimpleStorage --rpc-url 127.0.0.1:8545 --account defaultkey --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast -vvvv
 ```
 
-## EVM和zksync交易类型
+## 交易
+### 交易费计算
+Total Cost = Gas Used * Gas Price
+
+279,288.255846978 Gwei = 357,498 * 0.781230261 Gwei  => 0.000279288255846978 ETH
+[例子](https://sepolia.etherscan.io/tx/0xc496b9d30df33aa9285ddd384c14ce2a58eef470898b5cda001d0f4a21b017f6)
+### EVM和zksync交易类型
 以太坊虚拟机（EVM）和ZKsync生态系统支持多种交易类型，以适应各种以太坊改提案(EIP)。最初，以太坊只有一种交易类型(`0x0`)，
 但随着生态系统演变，通过各种EIP引入了多种类型。
 - Legacy `0x0`：evm最初的交易类型
@@ -64,6 +70,7 @@ forge script script/DeploySimpleStorage.s.sol:DeploySimpleStorage --rpc-url 127.
 - EIP-1559 `0x2`：当前EVM的默认类型。在以太坊伦敦升级中引入，EIP-1559：ETH 1.0 链费用市场变更，修改了交易费用的处理方式，用基础费用替换了 gasPrice ，并允许用户设置 maxPriorityFeePerGas 和 maxFeePerGas 。
 - EIP-712 `0x71`：类型化结构化数据哈希和签名，允许在交易中实现结构化数据的哈希和签名。ZKsync Era 使用这项技术来实现账户抽象和代付主等功能。
 
+[交易类型的区别、legacy、eip-1559、eip-2930、eip-4844](https://learnblockchain.cn/article/8858)
 
 ## Forge
 ### forge init初始化项目 
