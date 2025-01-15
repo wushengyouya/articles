@@ -272,7 +272,15 @@ cast parse-bytes32-string 0x6d696b6173610000000000000000000000000000000000000000
 forge inspect <contract_name> <option>
 forge inspect PasswordStore storage
 ```
+### 解析函数的返回值
+```bash
+# 1
+cast abi-decode "name()(string)" \ 
+0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000084f7572546f6b656e000000000000000000000000000000000000000000000000
 
+# 2
+cast call 0x0165878A594ca255338adfa4d48449f69242Eb8F "balanceOf(address)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 | cast to-dec
+```
 
 ## Anvil
 Anvil是Foundry套件的一部分，专为提供一个便于本地测试和开发的以太坊节点而设计。Anvil与Forge、Cast、Chisel一起为智能合约开发者提供了一个完整的工具集，以支持从开发到测试的整个生命周期。
