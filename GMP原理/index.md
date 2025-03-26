@@ -1,7 +1,7 @@
 ---
 author: 吴生有涯
 title: GMP原理
-date: 2023-2-4
+date: 2023-02-04
 description: 
 image: image-1.png
 categories:

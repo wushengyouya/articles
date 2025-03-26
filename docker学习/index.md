@@ -87,3 +87,29 @@ dockerfile
     -v /root/mysql/init:/docker-entrypoint-initdb.d \
     -v /root/mysql/conf:/etc/mysql/conf.d \
     mysql
+
+
+### 更新docker compose中的某个镜像
+```bash
+# 1.本地保存镜像文件为另一个版本号
+# 编译
+docker build -t metaverse:1.1 .
+# 保存
+docker save metaverse:1.1 > metaverse_v1.2.tar
+# 2.上传本地保存的rar镜像文件
+sudo rz
+# 3.加载镜像
+docker load -i metaverse_v1.1.tar
+# 4.修改docker-compose.yaml文件的镜像版本号
+vim docker-compose.yaml
+# 5.重新编译docker-compose的某一个镜像
+# -d 为后台运行 --no-deps 不启动链接的服务
+docker compose -f [*.yaml] up -d --no-deps --build [镜像名]
+docker compose -f ./metaverse_docker-compose.yaml up -d --no-deps --build metaverse
+# 6.查看Logs
+# 查看当前compose.yaml文件下的所有镜像
+docker compose -f ./metaverse_docker-compose.yaml ps --services
+# 查看指定镜像的Log
+docker compose -f ./metaverse_docker-compose.yaml logs -f metaverse
+```
+
