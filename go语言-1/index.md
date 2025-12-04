@@ -17,33 +17,33 @@ tags:
 - 自带垃圾回收机制，降低了内存泄漏的风险
 - go鼓励使用组合而不是继承来组织和复用代码。它的结构体（structs）可以嵌入其他类型。
 ## 关键字(25个)
-| 关键字     | 描述                                       |
-|------------|------------------------------------------|
-| `break`    | 用于终止当前循环                         |
-| `case`     | switch 语句中的一个分支                |
-| `chan`     | 表示一个通道类型                         |
-| `const`    | 定义常量                                 |
-| `continue` | 跳过当前循环的剩余代码，开始下一次循环  |
-| `default`  | switch 或 select 语句中的默认分支      |
-| `defer`    | 延迟执行一个函数直到上层函数返回        |
-| `else`     | if 语句中的否则分支                    |
-| `fallthrough` | 在 switch 语句中强制执行下一个 case |
-| `for`      | 循环语句                               |
-| `func`     | 定义一个函数                             |
-| `go`       | 启动一个新的 goroutine                 |
-| `goto`     | 转到一个标签                             |
-| `if`       | 条件语句                                 |
-| `import`   | 引入包                                   |
-| `interface`| 定义一个接口                             |
-| `map`      | 表示一个映射类型                         |
-| `package`  | 定义一个包                               |
-| `range`    | 迭代数组、切片、字符串、映射或通道     |
-| `return`   | 从函数中返回                             |
-| `select`   | 选择不同类型的通讯                     |
-| `struct`   | 定义一个结构体                           |
-| `switch`   | 条件分支语句                             |
-| `type`     | 类型定义或类型别名                       |
-| `var`      | 定义一个变量                             |
+| 关键字        | 描述                                   |
+| ------------- | -------------------------------------- |
+| `break`       | 用于终止当前循环                       |
+| `case`        | switch 语句中的一个分支                |
+| `chan`        | 表示一个通道类型                       |
+| `const`       | 定义常量                               |
+| `continue`    | 跳过当前循环的剩余代码，开始下一次循环 |
+| `default`     | switch 或 select 语句中的默认分支      |
+| `defer`       | 延迟执行一个函数直到上层函数返回       |
+| `else`        | if 语句中的否则分支                    |
+| `fallthrough` | 在 switch 语句中强制执行下一个 case    |
+| `for`         | 循环语句                               |
+| `func`        | 定义一个函数                           |
+| `go`          | 启动一个新的 goroutine                 |
+| `goto`        | 转到一个标签                           |
+| `if`          | 条件语句                               |
+| `import`      | 引入包                                 |
+| `interface`   | 定义一个接口                           |
+| `map`         | 表示一个映射类型                       |
+| `package`     | 定义一个包                             |
+| `range`       | 迭代数组、切片、字符串、映射或通道     |
+| `return`      | 从函数中返回                           |
+| `select`      | 选择不同类型的通讯                     |
+| `struct`      | 定义一个结构体                         |
+| `switch`      | 条件分支语句                           |
+| `type`        | 类型定义或类型别名                     |
+| `var`         | 定义一个变量                           |
 ## import
 ```go
 //导入单个包
@@ -370,5 +370,79 @@ func test2() (a int, b int, c string) {
 func test4(str string) *int {
 	num := 10
 	return &num
+}
+```
+## 迭代器
+go 1.23版本中引入的迭代器 `iter`
+| 类型           | 含义                  | 对应的for-range循环       |
+| -------------- | --------------------- | ------------------------- |
+| iter.Seq[V]    | 生成单个(v)的序列     | for v := range seq {...}  |
+| iter.Seq2[k,v] | 生成键值对(k,v)的序列 | for v := range seq2 {...} |
+
+它们的本质是一个函数，这个函数接收另一个名为`yield`的函数作为参数,你可以将`yield`理解为  
+一个传送门，迭代器的逻辑就是遍历数据，并把每个元素通过`yield(element)`传送出去。
+
+当`yield`返回`true`: 迭代器继续传送下一个元素
+
+当`yield`返回`false`：迭代器提前停止
+
+`iter`包支持两种使用模式,`for-range`循环使用的是`push`模式,  
+当你需要在更复杂的逻辑中手动控制迭代(例如一次只取一个值，或者在多个迭代器间交叉取值),使用`pull`模式  
+`iter.Pull`函数将`Seq`转为拉取迭代器.
+
+```go
+package main
+
+import (
+	"fmt"
+	"iter"
+	"maps"
+)
+
+// go 1.23中引入了iter迭代器
+func main() {
+	///// push模式
+	// 使用迭代器
+	// 循环会驱动 Count(5) 返回的函数执行，并接收 yield 传送出来的值
+	for v := range Count(5) {
+		fmt.Println(v) // 0 1 2 3 4 5
+	}
+	m := map[string]int{"one": 1, "two": 2, "three": 3}
+	// 自带的迭代器
+	keys := maps.Keys(m)
+	// 输出Map中所有的key，每次输出的顺序不能保证一样
+	for v := range keys {
+		fmt.Println(v)
+	}
+	values := maps.Values(m)
+	// 输出map中所有的值
+	for v := range values {
+		fmt.Println(v)
+	}
+
+	//// pull 模式 手动控制,或者 一个一个拉取
+	next, stop := iter.Pull(Count(5))
+	defer stop() // 确保迭代器资源被正确清理
+	// 手动拉取值
+	v1, ok1 := next()
+	fmt.Println(v1, ok1)
+
+	v2, ok2 := next()
+	fmt.Println(v2, ok2)
+
+	// 提前停止 手动执行 stop
+	// stop()
+}
+// 创建一个自定义迭代器
+func Count(n int) iter.Seq[int] {
+	// 返回一个 iter.Seq[int]
+	return func(yield func(int) bool) {
+		for i := 0; i < n; i++ {
+			// 将 i 传给yield，如果yield返回false则停止
+			if !yield(i) {
+				return
+			}
+		}
+	}
 }
 ```
