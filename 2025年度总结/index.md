@@ -7,6 +7,7 @@ image: image-9.png
 categories:
   - 年度总结
 ---
+![2025干杯](image-10.png)
 ## 随记
 今天是2025的最后一天，外面下着大雨，下班回来的路上鞋被雨水淋湿，冰冷的脚让我加快了回家的步伐。
 
@@ -34,9 +35,9 @@ categories:
 
 今年我的年度动画是-末日后酒店。
 
-![alt text](image-1.png)  ![alt text](image.png)  ![alt text](image-2.png)  ![alt text](image-3.png)  ![alt text](image-8.png)
+![ave mujika](image-1.png)  ![Re0](image.png)  ![夏日口袋](image-2.png)  ![胆大党](image-3.png)  ![沉默的魔女](image-8.png)
 
-![alt text](image-4.png)  ![我独自升级 第二季 -起于暗影-](image-5.png)  ![末日后酒店](image-6.png)  ![金牌得主](image-7.png) ![alt text](579ca046f8dee655e01f530ec187cf6e.png)
+![碧蓝之海第二季](image-4.png)  ![我独自升级 第二季 -起于暗影-](image-5.png)  ![末日后酒店](image-6.png)  ![金牌得主](image-7.png) ![BILIBILI番剧年鉴](579ca046f8dee655e01f530ec187cf6e.png)
 
 
 
