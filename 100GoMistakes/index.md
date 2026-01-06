@@ -263,3 +263,121 @@ if err != nil {
 47.并发是指同时处理多项任务。并行是指同时执行多项任务。
 
 48.在开发并发应用程序时，必须明确区分数据竞争与竞争条件。当多个goroutine同时访问同一内存地址且至少有一个在写入时，就会发生数据竞争。这种现象会导致程序出现异常行为。但需要注意的是，无数据竞争的应用程序并不意味着结果绝对确定。即使程序没有数据竞争，仍可能因goroutine执行速度、消息发布到通道的时效性、数据库调用耗时等不可控因素产生波动——这正是竞争条件的表现。准确理解这两个概念，是掌握并发应用设计精髓的关键所在。
+
+49.如果传输context不确定时使用context.TODO()，context必须要保证一直存在直到函数返回
+
+50.创建一个go程必须清楚的知道它什么时候执行关闭,必须一直占用资源
+
+51.在使用带多个通道的select语句时，必须注意：当多个选项同时就绪时，源码中的第一个case不会自动胜出。Go会随机挑选可执行的case，因此无法保证具体选中哪个选项。针对单个生产者协程的情况，可通过无缓冲通道或单一通道解决此问题；而对于多个生产者协程的场景，则可通过嵌套select配合default子句来实现优先级处理。
+
+52.通道可以携带数据或不携带数据。若希望按照Go语言惯例设计符合习惯的API，需注意：不携带数据的通道应声明为`chan struct{}`类型。这种设计能向接收方明确传达：消息本身不包含任何有意义的内容，其价值仅在于传递"已接收到信号"这一事实。在Go语言中，此类通道被称为**通知通道**。
+
+53.总结来说，等待一个nil通道或向nil通道发送数据会导致阻塞，而这一特性并非无用。正如我们在合并两个通道的示例中所见，可以利用nil通道来实现一种精巧的状态机，从而动态地从select语句中移除其中一个分支。让我们记住这个思路：nil通道在特定场景下非常有用，应成为Go开发者在处理并发代码时的工具之一。
+```go
+// 示例：使用nil通道动态管理select分支
+for {
+    select {
+    case v, ok := <-ch1:
+        if !ok {
+            ch1 = nil // 将通道置为nil，使此case不再被选中
+            continue
+        }
+        process(v)
+    case v, ok := <-ch2:
+        if !ok {
+            ch2 = nil // 将通道置为nil，使此case不再被选中
+            continue
+        }
+        process(v)
+    }
+
+    if ch1 == nil && ch2 == nil {
+        break // 两个通道都已关闭，退出循环
+    }
+}
+```
+54.在并发中使用字符串格式化可能会导致`数据竞争`与`死锁`
+```go
+func potentialDeadlock() {
+    var mu sync.Mutex
+    
+    mu.Lock()
+    // 危险：如果format内部触发了需要同一锁的操作
+    s := fmt.Sprintf("Locked: %v", someFunction()) 
+    mu.Unlock()
+}
+
+func someFunction() string {
+    // 如果这里也需要获取同一个锁，就会死锁
+    mu.Lock() // 第二次尝试加锁 - 死锁！
+    defer mu.Unlock()
+    return "data"
+}
+
+//// 数据竞争
+var sharedData string
+
+func goroutine1() {
+    // 不安全：同时修改共享数据
+    sharedData = fmt.Sprintf("Value: %d", time.Now().Unix())
+}
+
+func goroutine2() {
+    // 同时读取或修改 sharedData
+    fmt.Println(sharedData)
+}
+```
+
+55.在并发环境中处理切片时，我们必须记住，对切片使用 `append` 操作并不总是无竞态的。根据切片的状态以及它是否已满，行为会发生变化。如果切片已满，`append` 操作是无竞态的。否则，多个 goroutine 可能会竞争更新同一个数组索引，从而导致数据竞态。
+```go
+s := make([]int, 1) // 无数据竟态,当一个go程插入后，切片已满底层会重新创建一个数组扩容
+s := make([]int, 0, 1) // 存在数据竟态,两个go程都访问索引为 1 的位置
+go func() {
+  s1 := append(s, 1)
+  fmt.Println(s1)
+}()
+go func() {
+  s2 := append(s, 1)
+  fmt.Println(s2)
+}()
+```
+
+56.当需要触发多个goroutine并处理错误及上下文传递时，可考虑errgroup是否为一种解决方案。
+```go
+func handler(ctx context.Context, circles []Circle) ([]Result, error) {
+  results := make([]Result, len(circles))
+  g, ctx := errgroup.WithContext(ctx)
+  for i, circle := range circles {
+    i := i
+    circle := circle
+    g.Go(func() error {
+      result, err := foo(ctx, circle)
+        if err != nil {
+          return err
+        }
+        results[i] = result
+        return nil
+    })
+  }
+  if err := g.Wait(); err != nil { // g.Wait() 等待所有go程执行完成
+    return nil, err
+  }
+  return results, nil
+}
+```
+
+57.使用`sync`包时，任何时候不要使用复制值。当多个goroutine需要访问同一同步元素时，必须确保它们都依赖于同一实例。该规则适用于同步包中定义的所有类型。使用指针是解决此问题的方法：我们可以使用指向同步元素的指针，或指向包含同步元素的结构体的指针。
+```go
+// 都不能被复制
+sync.Cond
+sync.Map
+sync.Mutex
+sync.RWMutex
+sync.Once
+sync.Pool
+sync.WaitGroup
+```
+在以下情况下，我们可能会遇到意外复制sync字段的问题：
+- 调用具有值接收器的方法（如前所述）
+- 调用接收sync类型参数的函数
+- 调用接收包含sync字段的结构体参数的函数
