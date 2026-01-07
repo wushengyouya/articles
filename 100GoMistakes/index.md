@@ -381,3 +381,290 @@ sync.WaitGroup
 - 调用具有值接收器的方法（如前所述）
 - 调用接收sync类型参数的函数
 - 调用接收包含sync字段的结构体参数的函数
+
+58.通常使用time.After方法时需谨慎。需注意资源仅在计时器到期后才会释放。若在循环、Kafka消费者函数或HTTP处理程序中重复调用time.After，可能导致内存消耗激增。此时应优先选用time.NewTimer。
+```go
+func consumer(ch <-chan Event) {
+  timerDuration := 1 * time.Hour
+  timer := time.NewTimer(timerDuration)
+  for {
+    timer.Reset(timerDuration)
+    select {
+      case event := <-ch:
+      handle(event)
+      case <-timer.C:
+      log.Println("warning: no messages received")
+    }
+  }
+}
+```
+
+59.我们应当谨慎处理嵌入字段。虽然推广嵌入字段类型的字段和方法有时会带来便利，但也可能引发细微错误，因为这可能导致父结构体在缺乏明确信号的情况下实现接口。
+```go
+// json格式化 会有问题 ID字段会被省略 
+// 执行json.Marshal()后  "2021-05-18T21:15:08.381652+02:00"
+type Event struct {
+  ID int
+  time.Time // 这样会组合会实现time的所有方法,  time.Time实现了json.Marshaler当调用json.Marshal()会调用它已实现的方法
+}
+type Event struct {
+  ID int
+  Time time.Time // 使用
+}
+// 
+```
+
+60.反序列化json字符串可以使用`map[string]any`,需要注意的是使用任何数值类型（无论是否包含小数）时，系统都会将其转换为float64类型。
+
+## 数据库
+- `sql.Open`方法并不强制建立连接，首个连接可采用延迟建立机制。若需验证配置正确性并确认数据库连接状态，应在调用`sql.Open`后执行`Ping`或`PingContext`方法。  
+- 同样重要的是要记住，创建连接池会涉及四个可配置参数，我们可能需要对它们进行自定义。这些参数分别对应 *sql.DB 的四个导出方法：  
+  1.SetMaxOpenConns：对于生产级应用至关重要。由于默认值是`无限制`的，我们应通过设置该参数来确保连接数符合底层数据库的实际承载能力。  
+  2.SetMaxIdleConns：如果应用程序产生大量并发请求，应提高SetMaxIdleConns的默认值（默认为2），否则应用可能会频繁重新建立连接。  
+  3.SetConnMaxIdleTime：若应用程序可能面临突发请求，设置SetConnMaxIdleTime十分重要(默认无限制)。当应用恢复平稳状态时，我们需要确保已创建的连接最终被释放。  
+  4.SetConnMaxLifetime：在连接负载均衡数据库服务器等场景下，设置SetConnMaxLifetime会很有帮助(默认无限制)。这能确保应用程序不会过长时间占用单个连接。
+- 预编译语句是许多SQL数据库为执行重复SQL语句而实现的功能。在内部，该SQL语句经过预编译并与提供的数据分离。
+  ```go
+  // 如果某个sql语句需要重复执行可以使用预编译语句
+  // 优势是更有效率，更安全
+  stmt, err := db.Prepare("SELECT * FROM ORDER WHERE ID = ?")
+  ```
+- 处理查询中的空值。字段为指针，或使用SQL的NullXXX类型。`sql.NullString` `sql.NullBool`
+- 处理迭代中的行错误使用`row.Err`
+  ```go
+  func get(ctx context.Context, db *sql.DB, id string) (string, int, error) {
+    // ...
+    for rows.Next() {
+    // ...
+    }
+    if err := rows.Err(); err != nil {
+      return "", 0, err
+    }
+    return department, age, nil
+  }
+  ```
+
+62.所有实现`io.Closer`资源结构在使用完后都需要被关闭，不然可能导致内存泄漏或其他的问题。如`HTTP body` `sql.Rows` `os.File`
+```go
+type Closer interface {
+  Close() error
+}
+```
+
+63.在生产级应用中，必须避免使用默认的HTTP客户端和服务器。否则，由于缺乏超时机制，甚至存在恶意客户端利用服务器无超时限制的漏洞，可能导致请求无限期卡住。
+
+```go
+client := &http.Client{
+  Timeout: 5 * time.Second, // 请求超时等待时间
+  Transport: &http.Transport{
+      DialContext: (&net.Dialer{
+        Timeout: time.Second, // 连接超时等待时间
+      }).DialContext,
+      TLSHandshakeTimeout: time.Second, // tls握手超时等待时间
+      ResponseHeaderTimeout: time.Second, // 服务器响应头等待时间
+  },
+}
+s := &http.Server{
+  Addr: ":8080",
+  ReadHeaderTimeout: 500 * time.Millisecond, // 读取请求头等待超时
+  ReadTimeout: 500 * time.Millisecond, // 读取请求超时
+  Handler: http.TimeoutHandler(handler, time.Second, "foo"), // 一个封装函数，用于指定处理程序完成的最大时间
+}
+```
+
+## 测试
+- 给测试文件添加标识区分  
+  1.添加标识 `//go:build integration`      
+  2.使用短测试 `testing.Short()`  
+  3.使用环境变量标记
+```go
+//go:build integration
+package db
+import (
+"testing"
+)
+func TestInsert(t *testing.T) {
+// ...
+}
+// $ go test --tags=integration -v .
+```
+//go:build !integration 使用了`!`  
+若使用integration标签运行go test，则仅执行集成测试。    
+若不使用该标签运行go test，则仅执行单元测试。  
+
+- 一种测试分类方法涉及运行速度。我们需要区分短时运行测试与长时运行测试。举例来说，假设我们有一组单元测试，其中某个测试运行速度极慢。我们希望对这个慢速测试进行分类，避免每次运行（特别是当触发条件是文件保存后时）。短时运行模式使我们能够实现这种区分
+```go
+func TestLongRunning(t *testing.T) {
+  if testing.Short() {
+  t.Skip("skipping long-running test")
+  }
+  // ...
+}
+```
+
+- 我们应当牢记：对于使用并发的应用程序，强烈建议（甚至必须）在运行时启用-race参数。该参数可激活数据竞争检测器，通过代码监控来捕捉潜在的数据竞争。
+```shell
+go test -race ./...
+```
+
+- 当使用`t. Parallel`标记测试时，该测试会与所有其他并行测试同时执行。但在执行流程中，Go会先逐一运行所有顺序测试，待顺序测试完成后，再执行并行测试。
+```go
+// 先执行C 再并行执行 AB
+func TestA(t *testing.T) {
+  t.Parallel()
+  // ...
+}
+func TestB(t *testing.T) {
+  t.Parallel()
+  // ...
+}
+func TestC(t *testing.T) {
+  // ...
+}
+```
+
+- 表格驱动测试是一种高效编写精简测试的技巧。若多个单元测试具有相似结构，可采用表格驱动测试实现互化。该技术通过避免重复，简化了测试逻辑的修改，并便于新增用例。
+```go
+func TestFoo(t *testing.T) {
+  t.Run("subtest 1", func(t *testing.T) {
+    if false {
+      t.Error()
+    }
+  })
+  t.Run("subtest 2", func(t *testing.T) {
+    if 2 != 2 {
+      t.Error()
+    }
+  })
+}
+```
+
+- httptest软件包（https://pkg.go.dev/net/http/httptest）为HTTP测试提供客户端和服务器端的工具
+```go
+// 模拟请求
+req := httptest.NewRequest(http.MethodGet, "http://localhost",
+strings.NewReader("foo"))
+
+// 模拟服务器
+srv := httptest.NewServer(
+  http.HandlerFunc(
+  func(w http.ResponseWriter, r *http.Request) {
+    _, _ = w.Write([]byte(`{"duration": 314}`))
+    },
+  ),
+)
+defer srv.Close()
+```
+
+- iotest软件包（https://pkg.go.dev/testing/iotest）提供了测试读写器的实用工具。这个便捷的工具包常被Go开发者忽视。
+```go
+func TestLowerCaseReader(t *testing.T) {
+  err := iotest.TestReader(
+    &LowerCaseReader{reader: strings.NewReader("aBcDeFgHiJ")},
+    []byte("acegi"),
+  )
+  if err != nil {
+    t.Fatal(err)
+  }
+}
+```
+
+- 查看测试覆盖率
+```shell
+$ go test -coverprofile=coverage.out ./...
+$ go tool cover -html=coverage.out
+```
+
+- 测试环境准备，在测试前准备资源，在测试后关闭资源
+```go
+// 测试前setup
+func TestMySQLIntegration(t *testing.T) {
+  // ...
+  db := createConnection(t, "tcp(localhost:3306)/db")
+  // ...
+}
+
+func createConnection(t *testing.T, dsn string) *sql.DB {
+  db, err := sql.Open("mysql", dsn)
+  if err != nil {
+    t.FailNow()
+  }
+  t.Cleanup( // 测试完后关闭资源
+    func() {
+      _ = db.Close()
+  })
+  return db
+}
+```
+- 该特定函数接受一个`*testing.M`参数，该参数通过暴露单一的Run方法来执行所有测试。
+```go
+
+func TestMain(m *testing.M) {
+  setupMySQL()
+  code := m.Run()
+  teardownMySQL()
+  os.Exit(code)
+}
+```
+
+64.设计结构体时如何减少内存分配量？经验法则是对结构体进行重组，使其字段按类型大小降序排列。在本案例中，int64类型排在首位，随后是两个字节类型：
+```go
+// 由于结构体的大小必须是字长（8字节）的整数倍，因此其地址总长度为24字节而非17字节。编译时，Go编译器会添加填充数据以确保数据对齐
+type Foo struct {
+  i int64
+  b1 byte // 在64位的系统编译器默认会补 7个byte
+  b2 byte
+}
+```
+设计结构图需注意数据对齐问题。将Go结构体的字段按大小降序排列可避免填充。防止填充意味着分配更紧凑的结构体，这可能带来诸如减少垃圾回收频率和提升空间局部性等优化效果。
+
+65.若编译器无法确认变量在函数返回后未被引用，则该变量将被分配到堆内存中。
+- 函数或方法返回指针，变量会逃逸到堆中
+
+66.编译优化
+- map优化
+```go
+// 这个版本要快些，编译器会避免将bytes转为string
+func (c *cache) get(bytes []byte) (v int, contains bool) {
+  v, contains = c.m[string(bytes)]
+  return
+}
+func (c *cache) get(bytes []byte) (v int, contains bool) {
+  key := string(bytes)
+  v, contains = c.m[key]
+  return
+}
+```
+- sync.pool   
+  当我们需要频繁创建大量同一类型的对象时，可以考虑使用`sync.Pool`。作为一组可复用的临时对象存储池，它能有效避免同类数据的重复内存分配，并且支持多个goroutine安全并发访问。
+```go
+// 需要创建多个byte切片的场景使用sync.pool优化
+var pool = sync.Pool{
+  New: func() any {
+  return make([]byte, 1024)
+  },
+}
+func write(w io.Writer) {
+  buffer := pool.Get().([]byte)
+  buffer = buffer[:0]// 清空buffer
+  defer pool.Put(buffer)
+  getResponse(buffer)
+  _, _ = w.Write(buffer)
+}
+```
+67.使用pprof检测
+```go
+package main
+import (
+  "fmt"
+  "log"
+  "net/http"
+  _ "net/http/pprof"
+)
+func main() {
+  http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { 
+  fmt.Fprintf(w, "")
+  })
+  log.Fatal(http.ListenAndServe(":80", nil))
+}
+```
