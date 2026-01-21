@@ -668,3 +668,25 @@ func main() {
   log.Fatal(http.ListenAndServe(":80", nil))
 }
 ```
+
+68.`io.Discard` 是 Go 语言中处理 "我不关心这些数据" 场景的优雅解决方案，它让代码更清晰、更高效。
+- 与linuxe中`/dev/null`相似
+- `io.Discard`内部不执行任何操作，不占用内存，只有函数调用开销
+
+```go
+func downloadData(w io.Writer) error {
+    // 模拟下载数据并写入 w
+    _, err := w.Write([]byte("下载的数据..."))
+    return err
+}
+
+func main() {
+    // 我们只需要知道下载是否成功，不关心数据内容
+    err := downloadData(io.Discard)
+    if err != nil {
+        fmt.Println("下载失败:", err)
+    } else {
+        fmt.Println("下载成功")
+    }
+}
+```
